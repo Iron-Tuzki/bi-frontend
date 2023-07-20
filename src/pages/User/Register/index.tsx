@@ -49,9 +49,9 @@ const Register: React.FC = () => {
         message.success('注册成功');
         // 获取当前用户信息
         await fetchUserInfo();
-        // 跳转回登陆前页面
-        const urlParams = new URL(window.location.href).searchParams;
-        history.push(urlParams.get('redirect') || '/');
+        // 跳转到登录页面
+        const urlParams = '/user/login';
+        history.push(urlParams);
         return;
       } else {
         message.error(res.message);
