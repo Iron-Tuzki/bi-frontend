@@ -1,7 +1,20 @@
 import { listMyChartByPageUsingPOST } from '@/services/bi/chartController';
 import { useModel } from '@umijs/max';
-import { Avatar, Card, List, message, Result } from 'antd';
-import Search from 'antd/es/input/Search';
+import {
+  Avatar,
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  List,
+  message,
+  Result,
+  Row,
+  Select,
+  Space,
+  theme,
+} from 'antd';
 import ReactECharts from 'echarts-for-react';
 import React, { useEffect, useState } from 'react';
 
@@ -10,6 +23,15 @@ import React, { useEffect, useState } from 'react';
  * @constructor
  */
 const MyChart: React.FC = () => {
+  const { token } = theme.useToken();
+  const [form] = Form.useForm();
+  const formStyle = {
+    maxWidth: 'none',
+    background: token.colorFillAlter,
+    borderRadius: token.borderRadiusLG,
+    padding: 24,
+    height: 90,
+  };
   const initSearchParams = {
     current: 1,
     pageSize: 4,
@@ -52,31 +74,67 @@ const MyChart: React.FC = () => {
     loadData();
   }, [searchParams]);
 
+  const onFinish = (values: any) => {
+    setSearchParams({
+      ...initSearchParams,
+      name: values.name,
+      goal: values.goal,
+      chartType: values.chartType,
+    });
+    // loadData() 使用了钩子函数，当搜索条件发生变化，会自动执行
+  };
+
   return (
     <div className="my-chart">
-      <Search
-        placeholder="请输入图表名称"
-        allowClear
-        enterButton="Search"
-        loading={loading}
-        onSearch={(value) => {
-          setSearchParams({
-            ...initSearchParams,
-            name: value,
-          });
-        }}
-      />
+      {/*搜索栏*/}
+      <Form form={form} name="advanced_search" style={formStyle} onFinish={onFinish}>
+        <Row gutter={24}>
+          <Col span={8}>
+            <Form.Item name="name" label="图表名称">
+              <Input placeholder="请输入图表名称" />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item name="goal" label="分析需求">
+              <Input placeholder="请输入分析需求" />
+            </Form.Item>
+          </Col>
+          <Col span={4}>
+            <Form.Item name="chartType" label="图表类型">
+              <Select
+                placeholder="请选择"
+                options={[
+                  { value: '折线图', label: '折线图' },
+                  { value: '柱状图', label: '柱状图' },
+                  { value: '饼状图', label: '饼状图' },
+                  { value: '堆叠图', label: '堆叠图' },
+                  { value: '雷达图', label: '雷达图' },
+                ]}
+              ></Select>
+            </Form.Item>
+          </Col>
+          <Col span={4}>
+            <div style={{ textAlign: 'right' }}>
+              <Space size="small">
+                <Button type="primary" htmlType="submit">
+                  Search
+                </Button>
+                <Button
+                  onClick={() => {
+                    form.resetFields();
+                  }}
+                >
+                  Clear
+                </Button>
+              </Space>
+            </div>
+          </Col>
+        </Row>
+      </Form>
+      {/*列表栏*/}
       <div style={{ marginBottom: 20 }}></div>
       <List
-        grid={{
-          gutter: 16,
-          xs: 1,
-          sm: 1,
-          md: 1,
-          lg: 2,
-          xl: 2,
-          xxl: 2,
-        }}
+        grid={{ gutter: 16, xs: 1, sm: 1, md: 1, lg: 2, xl: 2, xxl: 2 }}
         loading={loading}
         pagination={{
           onChange: (page) => {
@@ -84,7 +142,6 @@ const MyChart: React.FC = () => {
               ...searchParams,
               current: page,
             });
-            loadData();
           },
           current: searchParams.current,
           pageSize: searchParams.pageSize,

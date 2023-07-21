@@ -18,6 +18,12 @@ export default [
     icon: 'barChart',
     component: './AddChartAsync',
   },
+  {
+    name: '数据智能分析（消息队列）',
+    path: '/add_chart_mq',
+    icon: 'barChart',
+    component: './AddChartMq',
+  },
   { name: '我的图表', path: '/my_chart', icon: 'TableOutlined', component: './MyChart' },
   { path: '/welcome', name: '欢迎', icon: 'smile', component: './Welcome' },
   {

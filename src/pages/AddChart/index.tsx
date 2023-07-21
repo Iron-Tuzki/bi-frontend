@@ -1,4 +1,4 @@
-import { genChartByAIUsingPOST, listChartByPageUsingPOST } from '@/services/bi/chartController';
+import { genChartByAIUsingPOST } from '@/services/bi/chartController';
 import { UploadOutlined } from '@ant-design/icons';
 import {
   Button,
@@ -16,7 +16,7 @@ import {
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import ReactECharts from 'echarts-for-react';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 /**
  * 添加图表页面
@@ -27,12 +27,6 @@ const AddChart: React.FC = () => {
   const [chart, setChart] = useState<API.BiResponse>();
   const [chartOption, setChartOption] = useState<any>();
   const [submitting, setSubmitting] = useState<boolean>(false);
-
-  useEffect(() => {
-    listChartByPageUsingPOST({}).then((res) => {
-      console.error('res', res);
-    });
-  });
 
   const onFinish = async (values: any) => {
     //避免重复提交

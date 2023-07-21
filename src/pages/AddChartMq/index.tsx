@@ -1,27 +1,18 @@
-import {
-  genChartByAIAsyncUsingPOST,
-  listChartByPageUsingPOST,
-} from '@/services/bi/chartController';
+import { genChartByAIMqUsingPOST } from '@/services/bi/chartController';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Card, Form, Input, message, Select, Space, Upload } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import TextArea from 'antd/es/input/TextArea';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 /**
  * 添加图表页面(异步)
  * @constructor
  */
-const AddChartAsync: React.FC = () => {
+const AddChartMq: React.FC = () => {
   const [form] = useForm();
   // 定义状态，用来接受后端返回值，实时展示
   const [submitting, setSubmitting] = useState<boolean>(false);
-
-  useEffect(() => {
-    listChartByPageUsingPOST({}).then((res) => {
-      console.error('res', res);
-    });
-  });
 
   const onFinish = async (values: any) => {
     //避免重复提交
@@ -35,7 +26,7 @@ const AddChartAsync: React.FC = () => {
       file: undefined,
     };
     try {
-      const res = await genChartByAIAsyncUsingPOST(params, {}, values.file.file.originFileObj);
+      const res = await genChartByAIMqUsingPOST(params, {}, values.file.file.originFileObj);
       if (!res?.data) {
         message.error('提交失败');
       } else {
@@ -105,4 +96,4 @@ const AddChartAsync: React.FC = () => {
     </div>
   );
 };
-export default AddChartAsync;
+export default AddChartMq;

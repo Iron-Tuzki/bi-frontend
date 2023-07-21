@@ -1,6 +1,4 @@
 import Footer from '@/components/Footer';
-
-import { listChartByPageUsingPOST } from '@/services/bi/chartController';
 import { getLoginUserUsingGET, userLoginUsingPOST } from '@/services/bi/userController';
 import { Link } from '@@/exports';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
@@ -8,7 +6,7 @@ import { LoginForm, ProFormText } from '@ant-design/pro-components';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { Helmet, history, useModel } from '@umijs/max';
 import { message, Tabs } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
 
@@ -42,12 +40,6 @@ const Login: React.FC = () => {
         "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
       backgroundSize: '100% 100%',
     };
-  });
-
-  useEffect(() => {
-    listChartByPageUsingPOST({}).then((res) => {
-      console.error('res', res);
-    });
   });
 
   const fetchUserInfo = async () => {
