@@ -59,7 +59,7 @@ const Login: React.FC = () => {
     try {
       // 登录
       const res = await userLoginUsingPOST(values);
-      if (res.code === 0) {
+      if (res.code === 200) {
         const defaultLoginSuccessMessage = '登录成功!';
         // 弹窗登录成功
         message.success(defaultLoginSuccessMessage);

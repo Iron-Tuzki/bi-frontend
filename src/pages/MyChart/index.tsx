@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   Col,
+  Drawer,
   Form,
   Input,
   List,
@@ -44,6 +45,17 @@ const MyChart: React.FC = () => {
   const { initialState } = useModel('@@initialState');
   const { currentUser } = initialState ?? {};
   const [loading, setLoading] = useState<boolean>(false);
+  const [open, setOpen] = useState(false);
+  const [result, setResult] = useState();
+
+  const showDrawer = (genResult: string) => {
+    setOpen(true);
+    setResult(genResult);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
 
   const loadData = async () => {
     try {
@@ -73,6 +85,16 @@ const MyChart: React.FC = () => {
   useEffect(() => {
     loadData();
   }, [searchParams]);
+
+  // 定时任务，前端轮询
+  useEffect(() => {
+    const timer = setInterval(() => {
+      // 实现定时任务的逻辑，如重新获取数据
+      loadData();
+    }, 120000);
+    // 在组件销毁时清除定时器
+    return () => clearInterval(timer);
+  }, []);
 
   const onFinish = (values: any) => {
     setSearchParams({
@@ -109,6 +131,7 @@ const MyChart: React.FC = () => {
                   { value: '饼状图', label: '饼状图' },
                   { value: '堆叠图', label: '堆叠图' },
                   { value: '雷达图', label: '雷达图' },
+                  { value: '散点图', label: '散点图' },
                 ]}
               ></Select>
             </Form.Item>
@@ -161,6 +184,7 @@ const MyChart: React.FC = () => {
                 title={item.name}
                 description={item.goal}
               />
+              <Button onClick={() => showDrawer(item.genResult)}>结论</Button>
               <>
                 {item.status === 'running' && (
                   <>
@@ -183,6 +207,17 @@ const MyChart: React.FC = () => {
           </List.Item>
         )}
       />
+
+      <Drawer
+        title="分析结论"
+        placement="left"
+        closable={false}
+        onClose={onClose}
+        open={open}
+        key="left"
+      >
+        {result}
+      </Drawer>
     </div>
   );
 };

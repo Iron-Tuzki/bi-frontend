@@ -73,6 +73,7 @@ const AddChartMq: React.FC = () => {
                 { value: '饼状图', label: '饼状图' },
                 { value: '堆叠图', label: '堆叠图' },
                 { value: '雷达图', label: '雷达图' },
+                { value: '散点图', label: '散点图' },
               ]}
             ></Select>
           </Form.Item>
