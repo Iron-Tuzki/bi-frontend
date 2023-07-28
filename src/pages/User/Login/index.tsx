@@ -44,12 +44,6 @@ const Login: React.FC = () => {
     };
   });
 
-  useEffect(() => {
-    listChartByPageUsingPOST({}).then((res) => {
-      console.error('res', res);
-    });
-  });
-
   const fetchUserInfo = async () => {
     const userInfo = await getLoginUserUsingGET();
     if (userInfo) {

@@ -1,15 +1,25 @@
-import { listMyChartByPageUsingPOST } from '@/services/bi/chartController';
-import { useModel } from '@umijs/max';
-import { Avatar, Card, List, message, Result } from 'antd';
-import Search from 'antd/es/input/Search';
+import {listMyChartByPageUsingPOST} from '@/services/bi/chartController';
+import {useModel} from '@umijs/max';
+import {Avatar, Button, Card, Col, Form, Input, List, message, Result, Row, Select, Space, theme} from 'antd';
 import ReactECharts from 'echarts-for-react';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
 /**
  * 添加图表页面
  * @constructor
  */
 const MyChart: React.FC = () => {
+  const {token} = theme.useToken();
+  const [form] = Form.useForm();
+
+  const formStyle = {
+    maxWidth: 'none',
+    background: token.colorFillAlter,
+    borderRadius: token.borderRadiusLG,
+    padding: 24,
+    height: 90
+  };
+
   const initSearchParams = {
     current: 1,
     pageSize: 4,
@@ -19,8 +29,8 @@ const MyChart: React.FC = () => {
   const [searchParams, setSearchParams] = useState<API.ChartQueryRequest>(initSearchParams);
   const [chartList, setChartList] = useState<API.Chart>();
   const [total, setTotal] = useState<number>(0);
-  const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState ?? {};
+  const {initialState} = useModel('@@initialState');
+  const {currentUser} = initialState ?? {};
   const [loading, setLoading] = useState<boolean>(false);
 
   const loadData = async () => {
@@ -52,21 +62,72 @@ const MyChart: React.FC = () => {
     loadData();
   }, [searchParams]);
 
+  const onFinish = (values: any) => {
+    setSearchParams({
+      ...initSearchParams,
+      name: values.name,
+      goal: values.goal,
+      chartType: values.chartType
+    })
+  };
+
+
   return (
     <div className="my-chart">
-      <Search
-        placeholder="请输入图表名称"
-        allowClear
-        enterButton="Search"
-        loading={loading}
-        onSearch={(value) => {
-          setSearchParams({
-            ...initSearchParams,
-            name: value,
-          });
-        }}
-      />
-      <div style={{ marginBottom: 20 }}></div>
+      <Form form={form} name="advanced_search" style={formStyle} onFinish={onFinish}>
+        <Row gutter={24}>
+          <Col span={8}>
+            <Form.Item
+              name='name'
+              label='图表名称'
+            >
+              <Input placeholder="请输入"/>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item
+              name='goal'
+              label='分析需求'
+            >
+              <Input placeholder="请输入"/>
+            </Form.Item>
+          </Col>
+          <Col span={4}>
+            <Form.Item
+              name='chartType'
+              label='图标类型'
+            >
+              <Select
+                placeholder="请选择图表类型"
+                options={[
+                  {value: '折线图', label: '折线图'},
+                  {value: '柱状图', label: '柱状图'},
+                  {value: '饼状图', label: '饼状图'},
+                  {value: '堆叠图', label: '堆叠图'},
+                  {value: '雷达图', label: '雷达图'},
+                ]}
+              ></Select>
+            </Form.Item>
+          </Col>
+          <Col>
+            <div style={{textAlign: 'right'}}>
+              <Space size="small">
+                <Button type="primary" htmlType="submit">
+                  Search
+                </Button>
+                <Button
+                  onClick={() => {
+                    form.resetFields();
+                  }}
+                >
+                  Clear
+                </Button>
+              </Space>
+            </div>
+          </Col>
+        </Row>
+      </Form>
+      <div style={{marginBottom: 20}}></div>
       <List
         grid={{
           gutter: 16,
@@ -84,7 +145,6 @@ const MyChart: React.FC = () => {
               ...searchParams,
               current: page,
             });
-            loadData();
           },
           current: searchParams.current,
           pageSize: searchParams.pageSize,
@@ -98,27 +158,27 @@ const MyChart: React.FC = () => {
         }
         renderItem={(item) => (
           <List.Item key={item.id}>
-            <Card style={{ width: '100%' }}>
+            <Card style={{width: '100%'}}>
               <List.Item.Meta
-                avatar={<Avatar src={currentUser?.userAvatar} />}
+                avatar={<Avatar src={currentUser?.userAvatar}/>}
                 title={item.name}
                 description={item.goal}
               />
               <>
                 {item.status === 'running' && (
                   <>
-                    <Result status="info" title="图表正在生成中，请稍等" />
+                    <Result status="info" title="图表正在生成中，请稍等"/>
                   </>
                 )}
                 {item.status === 'success' && (
                   <>
-                    <div style={{ marginBottom: 20 }}></div>
-                    <ReactECharts option={JSON.parse(item.genChart) ?? {}} />
+                    <div style={{marginBottom: 20}}></div>
+                    <ReactECharts option={JSON.parse(item.genChart) ?? {}}/>
                   </>
                 )}
                 {item.status === 'fail' && (
                   <>
-                    <Result status="error" title="图表生成失败" subTitle={item.execMessage} />
+                    <Result status="error" title="图表生成失败" subTitle={item.execMessage}/>
                   </>
                 )}
               </>

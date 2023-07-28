@@ -9,6 +9,7 @@ import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDrop
 import { errorConfig } from './requestErrorConfig';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
+const registerPath = '/user/register';
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -16,6 +17,7 @@ const loginPath = '/user/login';
 export async function getInitialState(): Promise<{
   currentUser?: API.LoginUserVO;
 }> {
+  const { location } = history;
   const fetchUserInfo = async () => {
     try {
       const res = await getLoginUserUsingGET();
@@ -25,9 +27,9 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
-  // 如果不是登录页面，执行
-  const { location } = history;
-  if (location.pathname !== loginPath) {
+  // 如果不是登录、注册页面，获取当前用户
+  const noList = [loginPath, registerPath]
+  if (!noList.includes(location.pathname)) {
     const currentUser = await fetchUserInfo();
     return {
       currentUser,

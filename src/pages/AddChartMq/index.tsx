@@ -12,7 +12,7 @@ import React, { useEffect, useState } from 'react';
  * 添加图表页面(异步)
  * @constructor
  */
-const AddChartAsync: React.FC = () => {
+const AddChartMq: React.FC = () => {
   const [form] = useForm();
   // 定义状态，用来接受后端返回值，实时展示
   const [submitting, setSubmitting] = useState<boolean>(false);
@@ -100,4 +100,4 @@ const AddChartAsync: React.FC = () => {
     </div>
   );
 };
-export default AddChartAsync;
+export default AddChartMq;

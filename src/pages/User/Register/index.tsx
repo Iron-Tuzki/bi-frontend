@@ -9,6 +9,7 @@ import { history, useModel } from '@umijs/max';
 import { message } from 'antd';
 import React, { useEffect } from 'react';
 import { flushSync } from 'react-dom';
+import {Link} from "@@/exports";
 
 const Register: React.FC = () => {
   const { setInitialState } = useModel('@@initialState');
@@ -24,11 +25,6 @@ const Register: React.FC = () => {
     };
   });
 
-  useEffect(() => {
-    listChartByPageUsingPOST({}).then((res) => {
-      console.error('res', res);
-    });
-  });
 
   const fetchUserInfo = async () => {
     const userInfo = await getLoginUserUsingGET();
@@ -133,6 +129,14 @@ const Register: React.FC = () => {
               },
             ]}
           />
+          <div
+            style={{
+              marginBottom: 24,
+            }}
+          >
+            <a></a>
+            <Link to="/user/login">返回登录页面</Link>
+          </div>
         </LoginForm>
       </div>
       <Footer />

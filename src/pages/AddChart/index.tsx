@@ -1,22 +1,9 @@
-import { genChartByAIUsingPOST, listChartByPageUsingPOST } from '@/services/bi/chartController';
-import { UploadOutlined } from '@ant-design/icons';
-import {
-  Button,
-  Card,
-  Col,
-  Divider,
-  Form,
-  Input,
-  message,
-  Row,
-  Select,
-  Space,
-  Spin,
-  Upload,
-} from 'antd';
+import {genChartByAIUsingPOST} from '@/services/bi/chartController';
+import {UploadOutlined} from '@ant-design/icons';
+import {Button, Card, Col, Divider, Form, Input, message, Row, Select, Space, Spin, Upload,} from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import ReactECharts from 'echarts-for-react';
-import React, { useEffect, useState } from 'react';
+import React, {useState} from 'react';
 
 /**
  * 添加图表页面
@@ -28,11 +15,6 @@ const AddChart: React.FC = () => {
   const [chartOption, setChartOption] = useState<any>();
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  useEffect(() => {
-    listChartByPageUsingPOST({}).then((res) => {
-      console.error('res', res);
-    });
-  });
 
   const onFinish = async (values: any) => {
     //避免重复提交
