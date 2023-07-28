@@ -7,6 +7,7 @@ import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
 import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
 import { errorConfig } from './requestErrorConfig';
+
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 const registerPath = '/user/register';
@@ -27,8 +28,8 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
-  // 如果不是登录、注册页面，获取当前用户
-  const noList = [loginPath, registerPath]
+  // 如果不是登录/注册页面，获取当前登录用户信息
+  const noList = [loginPath, registerPath];
   if (!noList.includes(location.pathname)) {
     const currentUser = await fetchUserInfo();
     return {
@@ -46,7 +47,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       src: initialState?.currentUser?.userAvatar,
       title: <AvatarName />,
       render: (_, avatarChildren) => {
-        return <AvatarDropdown>{avatarChildren}</AvatarDropdown>;
+        return <AvatarDropdown menu={true} children={avatarChildren}></AvatarDropdown>;
       },
     },
     waterMarkProps: {

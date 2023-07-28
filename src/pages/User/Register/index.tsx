@@ -1,15 +1,13 @@
 import Footer from '@/components/Footer';
-
-import { listChartByPageUsingPOST } from '@/services/bi/chartController';
 import { getLoginUserUsingGET, userRegisterUsingPOST } from '@/services/bi/userController';
+import { Link } from '@@/exports';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormText } from '@ant-design/pro-components';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { history, useModel } from '@umijs/max';
 import { message } from 'antd';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { flushSync } from 'react-dom';
-import {Link} from "@@/exports";
 
 const Register: React.FC = () => {
   const { setInitialState } = useModel('@@initialState');
@@ -24,7 +22,6 @@ const Register: React.FC = () => {
       backgroundSize: '100% 100%',
     };
   });
-
 
   const fetchUserInfo = async () => {
     const userInfo = await getLoginUserUsingGET();
@@ -41,7 +38,7 @@ const Register: React.FC = () => {
     try {
       // 注册
       const res = await userRegisterUsingPOST(values);
-      if (res.code === 0) {
+      if (res.code === 200) {
         message.success('注册成功');
         // 获取当前用户信息
         await fetchUserInfo();
@@ -135,7 +132,7 @@ const Register: React.FC = () => {
             }}
           >
             <a></a>
-            <Link to="/user/login">返回登录页面</Link>
+            <Link to="/user/login">返回登录页</Link>
           </div>
         </LoginForm>
       </div>

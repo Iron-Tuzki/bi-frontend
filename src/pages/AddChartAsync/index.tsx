@@ -1,12 +1,9 @@
-import {
-  genChartByAIAsyncUsingPOST,
-  listChartByPageUsingPOST,
-} from '@/services/bi/chartController';
+import { genChartByAIAsyncUsingPOST } from '@/services/bi/chartController';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Card, Form, Input, message, Select, Space, Upload } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import TextArea from 'antd/es/input/TextArea';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 /**
  * 添加图表页面(异步)
@@ -16,7 +13,6 @@ const AddChartAsync: React.FC = () => {
   const [form] = useForm();
   // 定义状态，用来接受后端返回值，实时展示
   const [submitting, setSubmitting] = useState<boolean>(false);
-
 
   const onFinish = async (values: any) => {
     //避免重复提交
