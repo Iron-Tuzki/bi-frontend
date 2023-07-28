@@ -2,10 +2,10 @@ import { userLogoutUsingPOST } from '@/services/bi/userController';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { history, useModel } from '@umijs/max';
-import { Spin } from 'antd';
+import {Button, Descriptions, Modal, Spin } from 'antd';
 import { stringify } from 'querystring';
 import type { MenuInfo } from 'rc-menu/lib/interface';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
 
@@ -21,6 +21,12 @@ export const AvatarName = () => {
 };
 
 export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, children }) => {
+
+  // 个人信息弹窗控制
+  const [open, setOpen] = useState(false);
+
+
+
   /**
    * 退出登录，并且将当前的 url 保存
    */
@@ -57,6 +63,10 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   });
   const { initialState, setInitialState } = useModel('@@initialState');
 
+  const showUserInfo = () => {
+    setOpen(true);
+  };
+
   const onMenuClick = useCallback(
     (event: MenuInfo) => {
       const { key } = event;
@@ -65,6 +75,11 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
           setInitialState((s) => ({ ...s, currentUser: undefined }));
         });
         loginOut();
+        return;
+      }
+      if (key === 'userInfo') {
+        // history.push('/user/info');
+        showUserInfo();
         return;
       }
       history.push(`/account/${key}`);
@@ -98,9 +113,9 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     ...(menu
       ? [
           {
-            key: 'center',
+            key: 'userInfo',
             icon: <UserOutlined />,
-            label: '个人中心',
+            label: '用户信息',
           },
           {
             key: 'settings',
@@ -119,15 +134,53 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     },
   ];
 
+
+  const handleOk = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setOpen(false);
+    }, 3000);
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+  };
+
   return (
-    <HeaderDropdown
-      menu={{
-        selectedKeys: [],
-        onClick: onMenuClick,
-        items: menuItems,
-      }}
-    >
-      {children}
-    </HeaderDropdown>
+    <>
+      <HeaderDropdown
+        menu={{
+          selectedKeys: [],
+          onClick: onMenuClick,
+          items: menuItems,
+        }}
+      >
+        {children}
+      </HeaderDropdown>
+      <Modal
+        open={open}
+        title="用户信息"
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            返回
+          </Button>,
+          <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+            修改
+          </Button>,
+        ]}
+      >
+        <Descriptions title="" bordered layout="vertical">
+          <Descriptions.Item label="用户名">{currentUser.userName}</Descriptions.Item>
+          <Descriptions.Item label="账户">{currentUser.userAccount}</Descriptions.Item>
+          <Descriptions.Item label="角色">{currentUser.userRole}</Descriptions.Item>
+          <Descriptions.Item label="创建时间">{currentUser.createTime}</Descriptions.Item>
+          <Descriptions.Item label="更新时间">{currentUser.updateTime}</Descriptions.Item>
+        </Descriptions>
+
+      </Modal>
+    </>
   );
 };

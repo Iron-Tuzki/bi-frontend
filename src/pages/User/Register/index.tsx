@@ -38,7 +38,7 @@ const Register: React.FC = () => {
     try {
       // 注册
       const res = await userRegisterUsingPOST(values);
-      if (res.code === 0) {
+      if (res.code === 200) {
         message.success('注册成功');
         // 获取当前用户信息
         await fetchUserInfo();

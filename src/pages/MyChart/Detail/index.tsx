@@ -1,10 +1,11 @@
-import { listMyChartByPageUsingPOST } from '@/services/bi/chartController';
-import { useModel } from '@umijs/max';
+import {listMyChartByPageUsingPOST} from '@/services/bi/chartController';
+import {useModel} from '@umijs/max';
 import {
   Avatar,
   Button,
   Card,
   Col,
+  Collapse,
   Drawer,
   Form,
   Input,
@@ -14,17 +15,18 @@ import {
   Row,
   Select,
   Space,
+  Tag,
   theme,
 } from 'antd';
 import ReactECharts from 'echarts-for-react';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
 /**
  * 添加图表页面
  * @constructor
  */
 const MyChart: React.FC = () => {
-  const { token } = theme.useToken();
+  const {token} = theme.useToken();
   const [form] = Form.useForm();
   const formStyle = {
     maxWidth: 'none',
@@ -42,8 +44,8 @@ const MyChart: React.FC = () => {
   const [searchParams, setSearchParams] = useState<API.ChartQueryRequest>(initSearchParams);
   const [chartList, setChartList] = useState<API.Chart>();
   const [total, setTotal] = useState<number>(0);
-  const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState ?? {};
+  const {initialState} = useModel('@@initialState');
+  const {currentUser} = initialState ?? {};
   const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
   const [result, setResult] = useState();
@@ -113,12 +115,12 @@ const MyChart: React.FC = () => {
         <Row gutter={24}>
           <Col span={8}>
             <Form.Item name="name" label="图表名称">
-              <Input placeholder="请输入图表名称" />
+              <Input placeholder="请输入图表名称"/>
             </Form.Item>
           </Col>
           <Col span={8}>
             <Form.Item name="goal" label="分析需求">
-              <Input placeholder="请输入分析需求" />
+              <Input placeholder="请输入分析需求"/>
             </Form.Item>
           </Col>
           <Col span={4}>
@@ -126,18 +128,18 @@ const MyChart: React.FC = () => {
               <Select
                 placeholder="请选择"
                 options={[
-                  { value: '折线图', label: '折线图' },
-                  { value: '柱状图', label: '柱状图' },
-                  { value: '饼状图', label: '饼状图' },
-                  { value: '堆叠图', label: '堆叠图' },
-                  { value: '雷达图', label: '雷达图' },
-                  { value: '散点图', label: '散点图' },
+                  {value: '折线图', label: '折线图'},
+                  {value: '柱状图', label: '柱状图'},
+                  {value: '饼状图', label: '饼状图'},
+                  {value: '堆叠图', label: '堆叠图'},
+                  {value: '雷达图', label: '雷达图'},
+                  {value: '散点图', label: '散点图'},
                 ]}
               ></Select>
             </Form.Item>
           </Col>
           <Col span={4}>
-            <div style={{ textAlign: 'right' }}>
+            <div style={{textAlign: 'right'}}>
               <Space size="small">
                 <Button type="primary" htmlType="submit">
                   Search
@@ -155,9 +157,9 @@ const MyChart: React.FC = () => {
         </Row>
       </Form>
       {/*列表栏*/}
-      <div style={{ marginBottom: 20 }}></div>
+      <div style={{marginBottom: 20}}></div>
       <List
-        grid={{ gutter: 16, xs: 1, sm: 1, md: 1, lg: 2, xl: 2, xxl: 2 }}
+        grid={{gutter: 16, xs: 1, sm: 1, md: 1, lg: 2, xl: 2, xxl: 2}}
         loading={loading}
         pagination={{
           onChange: (page) => {
@@ -178,31 +180,52 @@ const MyChart: React.FC = () => {
         }
         renderItem={(item) => (
           <List.Item key={item.id}>
-            <Card style={{ width: '100%' }}>
+            <Card style={{width: '100%'}}>
+              <div style={{display: 'flex', flexDirection: 'row', gap: 20, marginBottom: 10}}>
+                {item.name}
+                {
+                  item.chartType === '折线图' && <Tag color="red">{item.chartType}</Tag>
+                }
+                {
+                  item.chartType === '柱状图' && <Tag color="green">{item.chartType}</Tag>
+                }
+                {
+                  item.chartType === '饼状图' && <Tag color="cyan">{item.chartType}</Tag>
+                }
+                {
+                  item.chartType === '堆叠图' && <Tag color="blue">{item.chartType}</Tag>
+                }
+                {
+                  item.chartType === '雷达图' && <Tag color="gold">{item.chartType}</Tag>
+                }
+                {
+                  item.chartType === '散点图' && <Tag color="geekblue">{item.chartType}</Tag>
+                }
+              </div>
               <List.Item.Meta
-                avatar={<Avatar src={currentUser?.userAvatar} />}
-                title={item.name}
                 description={item.goal}
               />
-              <Button onClick={() => showDrawer(item.genResult)}>结论</Button>
               <>
                 {item.status === 'running' && (
                   <>
-                    <Result status="info" title="图表正在生成中，请稍等" />
+                    <Result status="info" title="图表正在生成中，请稍等"/>
                   </>
                 )}
                 {item.status === 'success' && (
                   <>
-                    <div style={{ marginBottom: 20 }}></div>
-                    <ReactECharts option={JSON.parse(item.genChart) ?? {}} />
+                    <div style={{marginBottom: 20}}></div>
+                    <ReactECharts option={JSON.parse(item.genChart) ?? {}}/>
                   </>
                 )}
                 {item.status === 'fail' && (
                   <>
-                    <Result status="error" title="图表生成失败" subTitle={item.execMessage} />
+                    <Result status="error" title="图表生成失败" subTitle={item.execMessage}/>
                   </>
                 )}
               </>
+              <Collapse
+                items={[{label: '分析结论', children: <p>{item.genResult}</p>}]}
+              />
             </Card>
           </List.Item>
         )}
@@ -221,4 +244,7 @@ const MyChart: React.FC = () => {
     </div>
   );
 };
+
+
 export default MyChart;
+
