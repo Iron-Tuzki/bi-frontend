@@ -214,7 +214,7 @@ const MyChart: React.FC = () => {
                 {item.status === 'success' && (
                   <>
                     <div style={{marginBottom: 20}}></div>
-                    <ReactECharts option={JSON.parse(item.genChart) ?? {}}/>
+                    <ReactECharts option={JSON.parse(item?.genChart) ?? {}}/>
                   </>
                 )}
                 {item.status === 'fail' && (

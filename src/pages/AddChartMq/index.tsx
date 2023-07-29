@@ -1,8 +1,8 @@
 import {genChartByAIMqUsingPOST, listMySimpleChartsUsingGET} from '@/services/bi/chartController';
 import {
   CheckCircleOutlined,
+  ClockCircleOutlined,
   CloseCircleOutlined,
-  ExclamationCircleOutlined,
   ReloadOutlined,
   SyncOutlined,
   UploadOutlined
@@ -66,7 +66,7 @@ const AddChartMq: React.FC = () => {
         <>
           {
             status === 'wait' &&
-            <Tag icon={<ExclamationCircleOutlined />} color="warning">
+            <Tag icon={<ClockCircleOutlined  />} color="default">
               warning
             </Tag>
           }
@@ -90,7 +90,7 @@ const AddChartMq: React.FC = () => {
           }
         </>
       ),
-    }
+    },
   ]
 
   const loadData = async () => {
