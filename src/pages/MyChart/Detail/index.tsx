@@ -20,7 +20,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {listMyChartByPageUsingPOST} from "@/services/bi/chartController";
 import ReactECharts from "echarts-for-react";
 
-let echarts = require('echarts');
+import Chart from '@/components/Chart';
 
 export const waitTimePromise = async (time: number = 100) => {
   return new Promise((resolve) => {
@@ -34,37 +34,45 @@ export const waitTime = async (time: number = 100) => {
   await waitTimePromise(time);
 };
 const {confirm} = Modal;
-export default () => {
+const MyChartDetail: React.FC = () => {
 
   const [total, setTotal] = useState<number>(0);
   const [isChartOpen, setIsChartOpen] = useState(false);
   const [chartCode, setChartCode] = useState<string>('{}');
   const actionRef = useRef<ActionType>();
+  const chartRef = useRef(null);
 
-  const handleOk = () => {
-    setIsChartOpen(false);
-    setChartCode('{}');
-    console.log('close1:' + chartCode);
-  };
   const showChart = (genChart: string) => {
-    handleOk();
-    console.log('show1' + chartCode);
     setChartCode(genChart);
     setIsChartOpen(true);
-    console.log('show2' + chartCode);
-  };
-
-
-
-  const handleCancel = () => {
-    setIsChartOpen(false);
-    setChartCode('{}');
-    console.log(chartCode);
   };
 
   const showData = (id: number) => {
-    console.log('show' + chartCode);
+    // 查询数据
   }
+
+  // 弹窗确认函数
+  const handleOk = (type: string) => {
+    if (type === 'chart') {
+      setIsChartOpen(false);
+      // 关闭时销毁echart实例，否则会重叠错乱
+      const chartInstance = chartRef.current.getEchartsInstance();
+      chartInstance.dispose();
+    } else if (type === 'data') {
+
+    }
+  };
+
+  // 弹窗关闭函数
+  const handleCancel = (type: string) => {
+    if (type === 'chart') {
+      setIsChartOpen(false);
+      const chartInstance = chartRef.current.getEchartsInstance();
+      chartInstance.dispose();
+    } else if (type === 'data') {
+
+    }
+  };
 
   const columns: ProColumns<API.Chart>[] = [
     {
@@ -233,15 +241,6 @@ export default () => {
           params.sortOrder = 'desc';
           // console.log(sort, filter);
           const res = await listMyChartByPageUsingPOST(params);
-          // if (res?.data?.records) {
-          //   // 统一删除标题title
-          //   res.data.records.forEach((record) => {
-          //     if (record.status === 'success') {
-          //       const chartOption = JSON.parse(record.genChart !== undefined ? record.genChart : '');
-          //       record.genChart = JSON.stringify(chartOption);
-          //     }
-          //   });
-          // }
           setTotal(res?.data?.total as number)
           return {
             data: res?.data?.records
@@ -288,9 +287,13 @@ export default () => {
           </Button>,
         ]}
       />
-      <Modal style={{height: 800, width: 1000}} title="" open={isChartOpen} onOk={handleOk} onCancel={handleCancel}>
-        <ReactECharts option={JSON.parse(chartCode as string) ?? {}}/>
+      <Modal width={1000} title="" open={isChartOpen} onOk={() => handleOk('chart')}
+             onCancel={() => handleCancel('chart')}>
+        <ReactECharts ref={chartRef} option={JSON.parse(chartCode as string) ?? {}} style={{width: 1000, height: 300}}/>
+        {/*<Chart parameter={JSON.parse(chartCode as string) ?? {}}/>*/}
       </Modal>
     </div>
   );
 };
+
+export default MyChartDetail;
