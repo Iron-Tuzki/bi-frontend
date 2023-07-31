@@ -26,9 +26,6 @@ export default [
   {
     name: '我的图表信息', path: '/myChart/detail', icon: 'TableOutlined', component: './MyChart/Detail'
   },
-  {
-    name: '用户信息', path: '/user/info', icon: 'UserOutlined', component: './User/Info'
-  },
   { path: '/welcome', name: '欢迎', icon: 'smile', component: './Welcome' },
   {
     path: '/admin',

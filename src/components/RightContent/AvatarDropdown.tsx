@@ -1,5 +1,5 @@
 import { userLogoutUsingPOST } from '@/services/bi/userController';
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import {AlertOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { history, useModel } from '@umijs/max';
 import {Button, Descriptions, Modal, Spin } from 'antd';
@@ -118,9 +118,14 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
             label: '用户信息',
           },
           {
+            key: 'userNotification',
+            icon: <AlertOutlined />,
+            label: '用户通知',
+          },
+          {
             key: 'settings',
             icon: <SettingOutlined />,
-            label: '个人设置',
+            label: '系统设置',
           },
           {
             type: 'divider' as const,

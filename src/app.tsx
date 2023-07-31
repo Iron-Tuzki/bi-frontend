@@ -7,6 +7,9 @@ import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
 import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
 import { errorConfig } from './requestErrorConfig';
+import {Badge} from "antd";
+import { useEffect, useState } from 'react';
+import {countUnreadUsingGET} from "@/services/bi/notificationController";
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -41,11 +44,24 @@ export async function getInitialState(): Promise<{
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const timer =  setInterval(async () => {
+      const res = await countUnreadUsingGET();
+      setCount(res.data);
+    }, 30000);
+
+    // 组件卸载时清除定时器
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
   return {
     actionsRender: () => [<Question key="doc" />],
     avatarProps: {
       src: initialState?.currentUser?.userAvatar,
-      title: <AvatarName />,
+      title: <Badge count={count} showZero><AvatarName /></Badge>,
       render: (_, avatarChildren) => {
         return <AvatarDropdown menu={true} children={avatarChildren}></AvatarDropdown>;
       },

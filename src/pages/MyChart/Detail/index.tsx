@@ -4,23 +4,24 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
+  DeleteOutlined,
   DotChartOutlined,
-  EditOutlined,
   LineChartOutlined,
   PieChartOutlined,
-  PlusOutlined,
   RadarChartOutlined,
   SyncOutlined,
   TableOutlined
 } from '@ant-design/icons';
 import type {ActionType, ProColumns} from '@ant-design/pro-components';
-import {ProTable, TableDropdown} from '@ant-design/pro-components';
-import {Button, Modal, Tag} from 'antd';
-import React, {useEffect, useRef, useState} from 'react';
-import {listMyChartByPageUsingPOST} from "@/services/bi/chartController";
+import {ProTable} from '@ant-design/pro-components';
+import {Button, message, Modal, Popconfirm, Table, Tag} from 'antd';
+import React, {useRef, useState} from 'react';
+import {
+  deleteChartUsingPOST,
+  getChartDataByIdUsingGET,
+  listMyChartByPageUsingPOST
+} from "@/services/bi/chartController";
 import ReactECharts from "echarts-for-react";
-
-import Chart from '@/components/Chart';
 
 export const waitTimePromise = async (time: number = 100) => {
   return new Promise((resolve) => {
@@ -38,7 +39,10 @@ const MyChartDetail: React.FC = () => {
 
   const [total, setTotal] = useState<number>(0);
   const [isChartOpen, setIsChartOpen] = useState(false);
+  const [isDataOpen, setIsDataOpen] = useState(false);
   const [chartCode, setChartCode] = useState<string>('{}');
+  const [dataColumns, setDataColumns] = useState<Record<string, any>[]>();
+  const [originalData, setOriginalData] = useState<Record<string, any>[]>();
   const actionRef = useRef<ActionType>();
   const chartRef = useRef(null);
 
@@ -47,8 +51,15 @@ const MyChartDetail: React.FC = () => {
     setIsChartOpen(true);
   };
 
-  const showData = (id: number) => {
+  const showData = async (id: number) => {
+    setIsDataOpen(true);
     // 查询数据
+    const params = {
+      chartId: id
+    }
+    const res = await getChartDataByIdUsingGET(params);
+    setDataColumns(res.data.columns);
+    setOriginalData(res.data.originalData);
   }
 
   // 弹窗确认函数
@@ -59,6 +70,7 @@ const MyChartDetail: React.FC = () => {
       const chartInstance = chartRef.current.getEchartsInstance();
       chartInstance.dispose();
     } else if (type === 'data') {
+      setIsDataOpen(false);
 
     }
   };
@@ -70,8 +82,30 @@ const MyChartDetail: React.FC = () => {
       const chartInstance = chartRef.current.getEchartsInstance();
       chartInstance.dispose();
     } else if (type === 'data') {
-
+      setIsDataOpen(false);
     }
+  };
+
+  const deleteChart = (id: number) => {
+    confirm({
+      title: '确认删除',
+      content: '确定要删除这条数据吗？',
+      async onOk() {
+        const params = {
+          id: id
+        }
+        const res = await deleteChartUsingPOST(params);
+        if (res.code === 200) {
+          message.success('删除成功');
+          actionRef.current?.reload();
+        } else {
+          message.error('删除失败');
+        }
+      },
+      onCancel() {
+      },
+    });
+
   };
 
   const columns: ProColumns<API.Chart>[] = [
@@ -195,14 +229,14 @@ const MyChartDetail: React.FC = () => {
       key: 'option',
       width: 130,
       render: (text, record, _, action) => [
-        <a
-          key="editable"
-          onClick={() => {
-            action?.startEditable?.(record.id);
-          }}
-        >
-          <Button size={'small'} icon={<EditOutlined/>}/>
-        </a>,
+        // <a
+        //   key="editable"
+        //   onClick={() => {
+        //     action?.startEditable?.(record.id);
+        //   }}
+        // >
+        //   <Button size={'small'} icon={<EditOutlined/>}/>
+        // </a>,
         <a
           key="showChart"
           onClick={
@@ -219,13 +253,28 @@ const MyChartDetail: React.FC = () => {
         >
           <Button size={'small'} icon={<TableOutlined/>}/>
         </a>,
-        <TableDropdown
-          key="actionGroup"
-          onSelect={() => action?.reload()}
-          menus={[
-            {key: 'delete', name: '删除'},
-          ]}
-        />,
+        <a
+          key="delete"
+        >
+          <Popconfirm
+            title="删除"
+            description="确定删除这条数据吗？"
+            onConfirm={() => deleteChart(record.id as number)}
+            onCancel={()=>{}}
+            okText="是"
+            cancelText="否"
+          >
+            <Button danger size={'small'} icon={<DeleteOutlined/>}/>
+          </Popconfirm>
+        </a>,
+
+        // <TableDropdown
+        //   key="actionGroup"
+        //   onSelect={() => action?.reload()}
+        //   menus={[
+        //     {key: 'delete', name: '删除'},
+        //   ]}
+        // />,
       ],
     },
   ];
@@ -275,22 +324,27 @@ const MyChartDetail: React.FC = () => {
         dateFormatter="string"
         headerTitle="图表详细信息"
         toolBarRender={() => [
-          <Button
-            key="button"
-            icon={<PlusOutlined/>}
-            onClick={() => {
-              actionRef.current?.reload();
-            }}
-            type="primary"
-          >
-            新建
-          </Button>,
+          // <Button
+          //   key="button"
+          //   icon={<PlusOutlined/>}
+          //   onClick={() => {
+          //     actionRef.current?.reload();
+          //   }}
+          //   type="primary"
+          // >
+          //   新建
+          // </Button>,
         ]}
       />
       <Modal width={1000} title="" open={isChartOpen} onOk={() => handleOk('chart')}
              onCancel={() => handleCancel('chart')}>
         <ReactECharts ref={chartRef} option={JSON.parse(chartCode as string) ?? {}} style={{width: 1000, height: 300}}/>
         {/*<Chart parameter={JSON.parse(chartCode as string) ?? {}}/>*/}
+      </Modal>
+
+      <Modal width={800} title="" open={isDataOpen} onOk={() => handleOk('data')}
+             onCancel={() => handleCancel('data')}>
+        <Table columns={dataColumns} dataSource={originalData}/>
       </Modal>
     </div>
   );
