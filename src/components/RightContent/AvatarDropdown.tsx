@@ -2,12 +2,13 @@ import { userLogoutUsingPOST } from '@/services/bi/userController';
 import {AlertOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { history, useModel } from '@umijs/max';
-import {Button, Descriptions, Modal, Spin } from 'antd';
+import {Button, Descriptions, Form, Modal, Spin, Switch } from 'antd';
 import { stringify } from 'querystring';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback, useState } from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
+import {getParamsUsingGET, switchStatusUsingGET} from "@/services/bi/sysParamsController";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -24,6 +25,13 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
 
   // 个人信息弹窗控制
   const [open, setOpen] = useState(false);
+  // 通知弹窗控制
+  const [nOpen, setNOpen] = useState(false);
+  const [sOpen, setSOPen] = useState(false);
+
+  // 系统设置
+  const [isNotifyChart, setIsNotifyChart] = useState<boolean>();
+  const [isNotifySql, setIsNotifySql] = useState<boolean>();
 
 
 
@@ -66,13 +74,35 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   const showUserInfo = () => {
     setOpen(true);
   };
+  const showNotification = () => {
+    setNOpen(true);
+  };
+  const showSettings = () => {
+    setSOPen(true);
+  };
+  const onChange = (type : string) => {
+    if (type === 'chart') {
+      setIsNotifyChart(!isNotifyChart);
+      const param = {
+        isNotifyChart : isNotifyChart ? 'false' : 'true'
+      };
+      const res = switchStatusUsingGET(param)
+    }
+    if (type === 'sql') {
+      setIsNotifySql(!isNotifySql);
+      const param = {
+        isNotifySql : isNotifySql ? 'false' : 'true'
+      };
+      const res = switchStatusUsingGET(param)
+    }
+  };
 
   const onMenuClick = useCallback(
-    (event: MenuInfo) => {
-      const { key } = event;
+    async (event: MenuInfo) => {
+      const {key} = event;
       if (key === 'logout') {
         flushSync(() => {
-          setInitialState((s) => ({ ...s, currentUser: undefined }));
+          setInitialState((s) => ({...s, currentUser: undefined}));
         });
         loginOut();
         return;
@@ -80,6 +110,17 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
       if (key === 'userInfo') {
         // history.push('/user/info');
         showUserInfo();
+        return;
+      }
+      if (key === 'userNotification') {
+        showNotification();
+        return;
+      }
+      if (key === 'settings') {
+        const res = await getParamsUsingGET();
+        setIsNotifyChart(res.data.isNotifyChart)
+        setIsNotifySql(res.data.isNotifySql)
+        showSettings();
         return;
       }
       history.push(`/account/${key}`);
@@ -150,6 +191,8 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
 
   const handleCancel = () => {
     setOpen(false);
+    setNOpen(false);
+    setSOPen(false);
   };
 
   return (
@@ -185,6 +228,54 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
           <Descriptions.Item label="更新时间">{currentUser.updateTime}</Descriptions.Item>
         </Descriptions>
 
+      </Modal>
+
+      <Modal
+        open={nOpen}
+        title="任务通知"
+        onOk={()=>{}}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            返回
+          </Button>,
+        ]}
+      >
+
+      </Modal>
+
+      <Modal
+        open={sOpen}
+        title="系统设置"
+        onOk={()=>{}}
+        width={300}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            返回
+          </Button>,
+        ]}
+      >
+
+        <Form
+          name="basic"
+          labelCol={{ span: 16}}
+          wrapperCol={{ span: 16 }}
+          style={{ maxWidth: 300 }}
+          initialValues={{ remember: true }}
+          autoComplete="off"
+        >
+          <Form.Item
+            label="是否通知图表生成状态"
+          >
+            <Switch checkedChildren="开启" unCheckedChildren="关闭" defaultChecked={isNotifyChart} onChange={()=>onChange('chart')}/>
+          </Form.Item>
+          <Form.Item
+            label="是否通知数据生成状态"
+          >
+            <Switch checkedChildren="开启" unCheckedChildren="关闭" defaultChecked={isNotifySql} onChange={()=>onChange('sql')}/>
+          </Form.Item>
+        </Form>
       </Modal>
     </>
   );
