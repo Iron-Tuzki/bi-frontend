@@ -394,9 +394,9 @@ declare namespace API {
 
   type switchStatusUsingGETParams = {
     /** isNotifyChart */
-    isNotifyChart: string;
+    isNotifyChart?: string;
     /** isNotifySql */
-    isNotifySql: string;
+    isNotifySql?: string;
   };
 
   type uploadFileUsingPOSTParams = {
@@ -432,6 +432,7 @@ declare namespace API {
     chartName?: string;
     chartType?: string;
     createTime?: string;
+    description?: string;
     id?: number;
     notificationType?: Record<string, any>;
     status?: Record<string, any>;

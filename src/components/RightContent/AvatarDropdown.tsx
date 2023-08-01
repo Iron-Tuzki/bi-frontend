@@ -2,13 +2,15 @@ import { userLogoutUsingPOST } from '@/services/bi/userController';
 import {AlertOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { history, useModel } from '@umijs/max';
-import {Button, Descriptions, Form, Modal, Spin, Switch } from 'antd';
+import {Button, Descriptions, Form, List, Modal, Skeleton, Spin, Switch } from 'antd';
 import { stringify } from 'querystring';
 import type { MenuInfo } from 'rc-menu/lib/interface';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
 import {getParamsUsingGET, switchStatusUsingGET} from "@/services/bi/sysParamsController";
+import {getAllUnreadUsingGET} from "@/services/bi/notificationController";
+import Notification from "@/components/RightContent/Notification";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -241,7 +243,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
           </Button>,
         ]}
       >
-
+        <Notification></Notification>
       </Modal>
 
       <Modal
@@ -266,12 +268,12 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
           autoComplete="off"
         >
           <Form.Item
-            label="是否通知图表生成状态"
+            label="图表生成任务状态通知"
           >
             <Switch checkedChildren="开启" unCheckedChildren="关闭" defaultChecked={isNotifyChart} onChange={()=>onChange('chart')}/>
           </Form.Item>
           <Form.Item
-            label="是否通知数据生成状态"
+            label="数据生成任务状态通知"
           >
             <Switch checkedChildren="开启" unCheckedChildren="关闭" defaultChecked={isNotifySql} onChange={()=>onChange('sql')}/>
           </Form.Item>
