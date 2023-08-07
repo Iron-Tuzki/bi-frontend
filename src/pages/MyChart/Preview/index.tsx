@@ -47,17 +47,7 @@ const MyChart: React.FC = () => {
   const {initialState} = useModel('@@initialState');
   const {currentUser} = initialState ?? {};
   const [loading, setLoading] = useState<boolean>(false);
-  const [open, setOpen] = useState(false);
-  const [result, setResult] = useState();
 
-  const showDrawer = (genResult: string) => {
-    setOpen(true);
-    setResult(genResult);
-  };
-
-  const onClose = () => {
-    setOpen(false);
-  };
 
   const loadData = async () => {
     try {
@@ -230,17 +220,6 @@ const MyChart: React.FC = () => {
           </List.Item>
         )}
       />
-
-      <Drawer
-        title="分析结论"
-        placement="left"
-        closable={false}
-        onClose={onClose}
-        open={open}
-        key="left"
-      >
-        {result}
-      </Drawer>
     </div>
   );
 };

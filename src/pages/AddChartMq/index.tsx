@@ -67,7 +67,7 @@ const AddChartMq: React.FC = () => {
           {
             status === 'wait' &&
             <Tag icon={<ClockCircleOutlined  />} color="default">
-              warning
+              wait
             </Tag>
           }
           {
