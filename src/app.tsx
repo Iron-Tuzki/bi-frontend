@@ -3,7 +3,7 @@ import { Question } from '@/components/RightContent';
 import { getLoginUserUsingGET } from '@/services/bi/userController';
 import { LinkOutlined } from '@ant-design/icons';
 import { SettingDrawer } from '@ant-design/pro-components';
-import type { RunTimeLayoutConfig } from '@umijs/max';
+import type {RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
 import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
 import { errorConfig } from './requestErrorConfig';
@@ -14,6 +14,16 @@ import {countUnreadUsingGET} from "@/services/bi/notificationController";
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 const registerPath = '/user/register';
+
+// src/app.tsx
+const authHeaderInterceptor = (url: string, options: RequestConfig) => {
+  const token = localStorage.getItem('BiToken');
+  const authHeader = { Authorization: `Bearer ${token}` };
+  return {
+    url: `${url}`,
+    options: { ...options, interceptors: true, headers: authHeader },
+  };
+};
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -50,7 +60,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     const timer =  setInterval(async () => {
       const res = await countUnreadUsingGET();
       setCount(res.data);
-    }, 30000);
+    }, 600000);
 
     // 组件卸载时清除定时器
     return () => {
@@ -145,4 +155,6 @@ export const request = {
   baseURL: 'http://localhost:8080',
   withCredentials: true,
   ...errorConfig,
+  // 新增自动添加AccessToken的请求前拦截器
+  requestInterceptors: [authHeaderInterceptor],
 };

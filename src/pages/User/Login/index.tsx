@@ -60,9 +60,11 @@ const Login: React.FC = () => {
       // 登录
       const res = await userLoginUsingPOST(values);
       if (res.code === 200) {
-        const defaultLoginSuccessMessage = '登录成功!';
+        // token放入localStorage
+        const token = res.data;
+        localStorage.setItem('BiToken', token as string);
         // 弹窗登录成功
-        message.success(defaultLoginSuccessMessage);
+        message.success('登录成功!');
         // 获取当前用户信息
         await fetchUserInfo();
         // 跳转回登陆前页面

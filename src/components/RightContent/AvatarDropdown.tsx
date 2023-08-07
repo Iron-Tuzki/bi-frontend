@@ -41,7 +41,10 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
    * 退出登录，并且将当前的 url 保存
    */
   const loginOut = async () => {
-    await userLogoutUsingPOST();
+    const params = {
+      userId: currentUser.id,
+    }
+    await userLogoutUsingPOST(params);
     const { search, pathname } = window.location;
     const urlParams = new URL(window.location.href).searchParams;
     /** 此方法会跳转到 redirect 参数所在的位置 */
@@ -103,10 +106,10 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     async (event: MenuInfo) => {
       const {key} = event;
       if (key === 'logout') {
+        loginOut();
         flushSync(() => {
           setInitialState((s) => ({...s, currentUser: undefined}));
         });
-        loginOut();
         return;
       }
       if (key === 'userInfo') {

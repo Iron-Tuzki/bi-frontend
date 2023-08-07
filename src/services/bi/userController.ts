@@ -87,7 +87,7 @@ export async function userLoginUsingPOST(
   body: API.UserLoginRequest,
   options?: { [key: string]: any },
 ) {
-  return request<API.BaseResponseLoginUserVO_>('/api/user/login', {
+  return request<API.BaseResponseString_>('/api/user/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -98,9 +98,16 @@ export async function userLoginUsingPOST(
 }
 
 /** userLogout POST /api/user/logout */
-export async function userLogoutUsingPOST(options?: { [key: string]: any }) {
+export async function userLogoutUsingPOST(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.userLogoutUsingPOSTParams,
+  options?: { [key: string]: any },
+) {
   return request<API.BaseResponseBoolean_>('/api/user/logout', {
     method: 'POST',
+    params: {
+      ...params,
+    },
     ...(options || {}),
   });
 }

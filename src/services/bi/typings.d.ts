@@ -427,6 +427,11 @@ declare namespace API {
     userPassword?: string;
   };
 
+  type userLogoutUsingPOSTParams = {
+    /** userId */
+    userId: string;
+  };
+
   type UserNotification = {
     chartId?: number;
     chartName?: string;
